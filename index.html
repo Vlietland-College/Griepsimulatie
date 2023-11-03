@@ -1,21 +1,49 @@
-<html><head>
+<!DOCTYPE html>
+<html>
+<head>
     <title>Griepepidemie Simulatie</title>
     <style>
+        body {
+            background-color: #F6F7D7;
+        }
         canvas {
-            border: 1px solid #000;
+            border: 10px solid #C9E8C2;
+        }
+        
+                #infectionText {
+          #  background-color: #fff;
+            padding: 10px;
+            margin-top: 20px;
+          #  border: 0px solid #000;
+           # border-radius: 0px;
+        }
+                        #infectionText2 {
+         #   background-color: #fff;
+            padding: 10px;
+            margin-top: 20px;
+
         }
     </style>
 </head>
 <body>
     <canvas id="simCanvas" width="450" height="450"></canvas>
+    <br>
     <label for="immuneCount">Aantal immune personen:</label>
+    <br>
     <input type="number" id="immuneCount" value="80">
     <br>
     <label for="infectionRate">Besmettingskans: <span id="infectionRateValue">40%</span></label>
     <input type="range" id="infectionRate" min="0" max="100" step="1" value="40">
+    <br>
     <button id="nextDayButton">Volgende dag</button>
     <button id="restartButton">Herstart simulatie</button>
-    <div id="infectionText">Besmettingen per dag:<br></div>
+    <br>    
+    <div id="infectionText" style="width: 150px; float:left; "></div>
+    <div id="infectionText2" style="width: 50px; float:left; "></div>
+    
+ 
+    
+    
 
     <script>
         const canvas = document.getElementById("simCanvas");
@@ -83,11 +111,19 @@
         }
 
         function updateInfectionText() {
-            const infectionText = document.getElementById("infectionText");
+                const infectionText = document.getElementById("infectionText");
             infectionText.innerHTML = "Besmettingen per dag:<br>";
             infectionData.forEach((infections, day) => {
-                infectionText.innerHTML += `Dag ${day + 1}: ${infections} besmetting(en)<br>`;
-            });
+                infectionText.innerHTML += `Dag ${day + 1}: <br>`;
+                     });
+        }
+     
+        function updateInfectionText2() {
+            const infectionText2 = document.getElementById("infectionText2");
+            infectionText2.innerHTML = "<br>";
+                infectionData.forEach((infections, day) => {
+                infectionText2.innerHTML += ` ${infections} <br>`;
+           });
         }
 
         function drawSimulation() {
@@ -102,7 +138,7 @@
                 } else if (balls[i]) {
                     ctx.fillStyle = "red";
                 } else {
-                    ctx.fillStyle = "blue";
+                    ctx.fillStyle = "#74B6E4";
                 }
                 ctx.fill();
                 ctx.closePath();
@@ -113,6 +149,7 @@
             spreadEpidemic();
             drawSimulation();
             updateInfectionText();
+            updateInfectionText2();
         }
 
         function restartSimulation() {
@@ -136,6 +173,5 @@
         drawSimulation();
         updateInfectionText();
     </script>
-
-
-</body></html>
+</body>
+</html>
