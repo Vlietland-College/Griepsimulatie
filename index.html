@@ -1,0 +1,141 @@
+<html><head>
+    <title>Griepepidemie Simulatie</title>
+    <style>
+        canvas {
+            border: 1px solid #000;
+        }
+    </style>
+</head>
+<body>
+    <canvas id="simCanvas" width="450" height="450"></canvas>
+    <label for="immuneCount">Aantal immune personen:</label>
+    <input type="number" id="immuneCount" value="80">
+    <br>
+    <label for="infectionRate">Besmettingskans: <span id="infectionRateValue">40%</span></label>
+    <input type="range" id="infectionRate" min="0" max="100" step="1" value="40">
+    <button id="nextDayButton">Volgende dag</button>
+    <button id="restartButton">Herstart simulatie</button>
+    <div id="infectionText">Besmettingen per dag:<br></div>
+
+    <script>
+        const canvas = document.getElementById("simCanvas");
+        const ctx = canvas.getContext("2d");
+        const rowCount = 30;
+        const colCount = 30;
+        const totalBalls = rowCount * colCount;
+        const initialInfectedCount = 5;
+        const ballSize = 15;
+        const immuneBalls = new Set();
+        const infectionData = [];
+
+        let balls = new Array(totalBalls).fill(false);
+        let infectionRate = 40;
+
+        function placeImmuneBalls(immuneCount) {
+            immuneBalls.clear();
+            while (immuneBalls.size < immuneCount) {
+                const immuneBall = Math.floor(Math.random() * totalBalls);
+                immuneBalls.add(immuneBall);
+            }
+        }
+
+        function setInitialInfectedBalls() {
+            const initialInfectedBalls = [];
+            for (let i = 0; i < initialInfectedCount; i++) {
+                let ball;
+                do {
+                    ball = Math.floor(Math.random() * totalBalls);
+                } while (initialInfectedBalls.includes(ball));
+                initialInfectedBalls.push(ball);
+                balls[ball] = true;
+            }
+        }
+
+        function spreadEpidemic() {
+            const newBalls = balls.slice();
+            infectionData.push(0);
+            for (let i = 0; i < totalBalls; i++) {
+                if (!balls[i] || immuneBalls.has(i)) continue;
+                const x = i % rowCount;
+                const y = Math.floor(i / colCount);
+                const neighbors = [];
+
+                if (x > 0) neighbors.push(i - 1);
+                if (x < rowCount - 1) neighbors.push(i + 1);
+                if (y > 0) neighbors.push(i - rowCount);
+                if (y < colCount - 1) neighbors.push(i + rowCount);
+
+                for (const neighbor of neighbors) {
+                    if (!immuneBalls.has(neighbor) && !balls[neighbor]) {
+                        if (Math.random() < infectionRate / 100) {
+                            newBalls[neighbor] = true;
+                            infectionData[infectionData.length - 1]++;
+                        }
+                    }
+                }
+            }
+            balls = newBalls;
+        }
+
+        function updateInfectionRate(value) {
+            infectionRate = parseInt(value);
+            document.getElementById("infectionRateValue").textContent = infectionRate + "%";
+        }
+
+        function updateInfectionText() {
+            const infectionText = document.getElementById("infectionText");
+            infectionText.innerHTML = "Besmettingen per dag:<br>";
+            infectionData.forEach((infections, day) => {
+                infectionText.innerHTML += `Dag ${day + 1}: ${infections} besmetting(en)<br>`;
+            });
+        }
+
+        function drawSimulation() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            for (let i = 0; i < totalBalls; i++) {
+                const x = i % rowCount;
+                const y = Math.floor(i / colCount);
+                ctx.beginPath();
+                ctx.arc(x * ballSize + ballSize / 2, y * ballSize + ballSize / 2, ballSize / 2, 0, Math.PI * 2);
+                if (immuneBalls.has(i)) {
+                    ctx.fillStyle = "green";
+                } else if (balls[i]) {
+                    ctx.fillStyle = "red";
+                } else {
+                    ctx.fillStyle = "blue";
+                }
+                ctx.fill();
+                ctx.closePath();
+            }
+        }
+
+        function nextDay() {
+            spreadEpidemic();
+            drawSimulation();
+            updateInfectionText();
+        }
+
+        function restartSimulation() {
+            balls = new Array(totalBalls).fill(false);
+            infectionData.length = 0;
+            setInitialInfectedBalls();
+            placeImmuneBalls(parseInt(document.getElementById("immuneCount").value));
+            drawSimulation();
+            updateInfectionText();
+        }
+
+        document.getElementById("infectionRate").addEventListener("input", (event) => {
+            updateInfectionRate(event.target.value);
+        });
+
+        document.getElementById("nextDayButton").addEventListener("click", nextDay);
+        document.getElementById("restartButton").addEventListener("click", restartSimulation);
+
+        setInitialInfectedBalls();
+        placeImmuneBalls(parseInt(document.getElementById("immuneCount").value));
+        drawSimulation();
+        updateInfectionText();
+    </script>
+
+
+</body></html>
