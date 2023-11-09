@@ -10,18 +10,22 @@
             border: 10px solid #C9E8C2;
         }
         
-                #infectionText {
-          #  background-color: #fff;
+        #infectionText {
+            background-color: #F6F7D7;
             padding: 10px;
             margin-top: 20px;
-          #  border: 0px solid #000;
-           # border-radius: 0px;
         }
-                        #infectionText2 {
-         #   background-color: #fff;
+        
+        #infectionText2 {
+            background-color: #F6F7D7;
             padding: 10px;
             margin-top: 20px;
+        }
 
+        #totalInfectionsText {
+            background-color: #fff;
+            padding: 10px;
+            margin-top: 20px;
         }
     </style>
 </head>
@@ -38,10 +42,10 @@
     <button id="nextDayButton">Volgende dag</button>
     <button id="restartButton">Herstart simulatie</button>
     <br>    
-    <div id="infectionText" style="width: 150px; float:left; "></div>
-    <div id="infectionText2" style="width: 50px; float:left; "></div>
-    
- 
+    <div id="infectionText" style="width: 150px; float:left;"></div>
+    <div id="infectionText2" style="width: 50px; float:left;"></div>
+    <div id="totalInfectionsText" style="width: 250px; float:left;"></div>
+
     
     
 
@@ -126,6 +130,23 @@
            });
         }
 
+        
+        
+               function updateTotalInfectionsText() {
+            const totalInfectionsText = document.getElementById("totalInfectionsText");
+            const totalInfections = infectionData.reduce((sum, infections) => sum + infections, 0);
+            totalInfectionsText.innerHTML = `Totaal aantal besmettingen: ${totalInfections}`;
+        }
+
+        function nextDay() {
+            spreadEpidemic();
+            drawSimulation();
+            updateInfectionText();
+            updateInfectionText2();
+            updateTotalInfectionsText(); // Voeg deze regel toe
+        }
+        
+       
         function drawSimulation() {
             ctx.clearRect(0, 0, canvas.width, canvas.height);
             for (let i = 0; i < totalBalls; i++) {
@@ -145,12 +166,7 @@
             }
         }
 
-        function nextDay() {
-            spreadEpidemic();
-            drawSimulation();
-            updateInfectionText();
-            updateInfectionText2();
-        }
+
 
         function restartSimulation() {
             balls = new Array(totalBalls).fill(false);
@@ -160,6 +176,7 @@
             drawSimulation();
             updateInfectionText();
             updateInfectionText2();
+            updateTotalInfectionsText(); 
         }
 
         document.getElementById("infectionRate").addEventListener("input", (event) => {
